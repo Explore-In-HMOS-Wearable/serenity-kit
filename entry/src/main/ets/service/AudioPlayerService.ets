@@ -21,71 +21,62 @@ class AudioPlayerService {
   private shouldLoop: boolean = true;
   private context: common.UIAbilityContext | null = null;
 
-  constructor() {}
+  constructor() {
+  }
 
-  // Set context from outside
   setContext(context: common.UIAbilityContext): void {
     this.context = context;
   }
 
-  // ✅ AVSession Init
   async initAVSession(): Promise<void> {
     try {
       if (this.avSessionInstance) {
         console.info('AudioPlayerService - AVSession already exists');
         return;
       }
-
       if (!this.context) {
         console.error('AudioPlayerService - Context not set');
         return;
       }
-
       this.avSessionInstance = await avSession.createAVSession(
         this.context,
         'Rain & Relax',
         'audio'
       );
-
       console.info('AudioPlayerService - AVSession created');
-
       await this.avSessionInstance.activate();
       console.info('AudioPlayerService - AVSession activated');
-
       this.setupAVSessionListeners();
-
     } catch (error) {
       const err = error as BusinessError;
       console.error('AudioPlayerService - AVSession init error:', err.code, err.message);
     }
   }
 
-  // ✅ AVSession Listeners
   private setupAVSessionListeners(): void {
-    if (!this.avSessionInstance) return;
-
+    if (!this.avSessionInstance) {
+      return;
+    }
     this.avSessionInstance.on('play', () => {
       console.info('AudioPlayerService - AVSession play command');
       if (this.currentSound) {
         this.resume();
       }
     });
-
     this.avSessionInstance.on('pause', () => {
       console.info('AudioPlayerService - AVSession pause command');
       this.pause();
     });
-
     this.avSessionInstance.on('stop', () => {
       console.info('AudioPlayerService - AVSession stop command');
       this.stop();
     });
   }
 
-  // ✅ AVSession Metadata Update
   private async updateAVSessionMetadata(title: string): Promise<void> {
-    if (!this.avSessionInstance) return;
-
+    if (!this.avSessionInstance) {
+      return;
+    }
     try {
       const metadata: avSession.AVMetadata = {
         assetId: '0',
@@ -103,10 +94,10 @@ class AudioPlayerService {
     }
   }
 
-  // ✅ AVSession Playback State Update
   private async updateAVSessionPlaybackState(state: avSession.PlaybackState): Promise<void> {
-    if (!this.avSessionInstance) return;
-
+    if (!this.avSessionInstance) {
+      return;
+    }
     try {
       const playbackState: avSession.AVPlaybackState = {
         state: state,
@@ -116,7 +107,6 @@ class AudioPlayerService {
           updateTime: Date.now()
         }
       };
-
       await this.avSessionInstance.setAVPlaybackState(playbackState);
       console.info('AudioPlayerService - AVSession playback state updated');
     } catch (error) {
@@ -136,7 +126,6 @@ class AudioPlayerService {
       });
       return this.ensurePlayer();
     }
-
     this.isInitializing = true;
     try {
       this.avPlayer = await media.createAVPlayer();
@@ -163,9 +152,7 @@ class AudioPlayerService {
           reject(new Error('Player does not exist'));
           return;
         }
-
         const currentState = this.avPlayer.state as string;
-
         if (currentState === targetState) {
           console.info(`AudioPlayerService - ✅ State reached: ${targetState}`);
           resolve();
@@ -181,8 +168,9 @@ class AudioPlayerService {
   }
 
   private setupListeners(): void {
-    if (!this.avPlayer) return;
-
+    if (!this.avPlayer) {
+      return;
+    }
     this.avPlayer.on('stateChange', (state: string) => {
       console.info(`AudioPlayerService - 🔄 State Changed: ${state}`);
 
@@ -211,27 +199,21 @@ class AudioPlayerService {
           break;
       }
     });
-
     this.avPlayer.on('error', (error) => {
       const err = error as AVError;
       const code = err.code || -1;
       const msg = err.message || 'Unknown error';
-
       console.error('AudioPlayerService - ERROR:', JSON.stringify(error));
       console.error('AudioPlayerService - Code:', code, 'Message:', msg);
-
-      // ✅ 5400102 IGNORE
       if (code === 5400102) {
         console.warn('AudioPlayerService - 5400102 ignored');
         return;
       }
-
       this.currentState = PlayerState.STOPPED;
       if (this.stateCallback) {
         this.stateCallback(this.currentState);
       }
     });
-
     this.avPlayer.on('endOfStream', () => {
       console.info('AudioPlayerService - Playback completed');
       if (this.shouldLoop && this.avPlayer) {
@@ -251,8 +233,6 @@ class AudioPlayerService {
       console.info(`AudioPlayerService - ▶️ Play starting: ${sound.name}`);
       this.currentSound = sound;
       this.shouldLoop = true;
-
-      // ✅ Update AVSession metadata
       await this.updateAVSessionMetadata(sound.name);
 
       const playerReady = await this.ensurePlayer();
@@ -263,8 +243,6 @@ class AudioPlayerService {
 
       const currentNativeState = this.avPlayer.state as string;
       console.info(`AudioPlayerService - Current native state: ${currentNativeState}`);
-
-      // ✅ MUST RETURN TO IDLE STATE
       if (currentNativeState !== 'idle') {
         console.info('AudioPlayerService - Player not idle, resetting...');
 
@@ -282,30 +260,18 @@ class AudioPlayerService {
 
         await this.waitForState('idle', 3000);
       }
-
       console.info('AudioPlayerService - Player idle, setting URL...');
-
-      // ✅ SET URL
       this.avPlayer.url = sound.url;
       console.info(`AudioPlayerService - URL set: ${sound.url}`);
-
-      // ✅ WAIT FOR INITIALIZED
       await this.waitForState('initialized', 8000);
-
-      // ✅ SET AudioRendererInfo
       this.avPlayer.audioRendererInfo = {
         usage: audio.StreamUsage.STREAM_USAGE_MUSIC,
-        rendererFlags: 0,
+        rendererFlags: 0
       };
       console.info('AudioPlayerService - AudioRendererInfo set');
-
-      // ✅ PREPARE
       await this.avPlayer.prepare();
       console.info('AudioPlayerService - Prepare called');
-
       await this.waitForState('prepared', 15000);
-
-      // ✅ PLAY
       await this.avPlayer.play();
       console.info('AudioPlayerService - Play called');
 
@@ -324,8 +290,9 @@ class AudioPlayerService {
 
   async pause(): Promise<void> {
     try {
-      if (!this.avPlayer) return;
-
+      if (!this.avPlayer) {
+        return;
+      }
       const state = this.avPlayer.state as string;
       if (state === 'playing') {
         await this.avPlayer.pause();
@@ -338,8 +305,9 @@ class AudioPlayerService {
 
   async resume(): Promise<void> {
     try {
-      if (!this.avPlayer) return;
-
+      if (!this.avPlayer) {
+        return;
+      }
       const state = this.avPlayer.state as string;
       if (state === 'paused') {
         await this.avPlayer.play();
@@ -354,9 +322,9 @@ class AudioPlayerService {
     try {
       this.clearTimer();
       this.shouldLoop = false;
-
-      if (!this.avPlayer) return;
-
+      if (!this.avPlayer) {
+        return;
+      }
       const state = this.avPlayer.state as string;
       if (state === 'playing' || state === 'paused' || state === 'prepared') {
         await this.avPlayer.stop();
@@ -396,8 +364,6 @@ class AudioPlayerService {
         this.avPlayer = null;
         console.info('AudioPlayerService - Player released');
       }
-
-      // ✅ Clean up AVSession
       if (this.avSessionInstance) {
         await this.avSessionInstance.deactivate();
         await this.avSessionInstance.destroy();

@@ -120,7 +120,7 @@ export struct DetailPage {
               .margin({ bottom: 5 })
 
             if (this.timerText) {
-              Text('⏲️ ' + this.timerText)
+              Text(`⏲️ ${this.timerText}`)
                 .fontSize(12)
                 .fontColor('#9B59B6')
                 .fontWeight(FontWeight.Bold)

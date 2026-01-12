@@ -8,7 +8,7 @@ interface DetailParams {
 @Component
 export struct Index {
   @Consume('navPathStack') navPathStack: NavPathStack;
-  @State playerState: PlayerState = PlayerState.STOPPED;
+  playerState: PlayerState = PlayerState.STOPPED;
 
   aboutToAppear() {
     // Set callback
@@ -65,7 +65,8 @@ export struct Index {
                 this.navPathStack.pushPathByName('DetailPage', params);
               })
             }
-          }, (sound: Sound, index: number) => sound.name + index)        }
+          }, (sound: Sound, index: number) => sound.name)
+        }
         .columnsTemplate('1fr 1fr')
         .rowsGap(15)
         .columnsGap(15)

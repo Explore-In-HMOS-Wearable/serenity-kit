@@ -5,10 +5,10 @@ A peaceful HarmonyOS ArkTS application that plays ambient nature sounds for rela
 
 # Preview
 <div>
-    <img src="screenshots/output.png" width="24%"> 
-    <img src="screenshots/output1.png" width="24%"> 
-    <img src="screenshots/output2.png" width="24%"> 
-    <img src="screenshots/output3.png" width="24%">
+<img src="screenshots/output.png" width="24%"> 
+<img src="screenshots/output1.png" width="24%"> 
+<img src="screenshots/output2.png" width="24%"> 
+<img src="screenshots/output3.png" width="24%">
 </div>
 
 # Features

@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.hmosdemos.serenitykit",
+    "bundleName": "com.hmosdemos.wearable.serenity_kit",
     "vendor": "hmosdemos",
     "versionCode": 1000000,
     "versionName": "1.0.0",

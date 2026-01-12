@@ -43,7 +43,9 @@ export class AVSessionManager {
   }
 
   private setupControlListeners(): void {
-    if (!this.session) return;
+    if (!this.session) {
+      return;
+    }
 
     // Play command
     this.session.on('play', () => {
@@ -65,7 +67,9 @@ export class AVSessionManager {
   }
 
   async updateMetadata(title: string, artist: string): Promise<void> {
-    if (!this.session) return;
+    if (!this.session) {
+      return;
+    }
 
     try {
       const metadata: avSession.AVMetadata = {
@@ -85,7 +89,9 @@ export class AVSessionManager {
   }
 
   async updatePlaybackState(state: avSession.AVPlaybackState): Promise<void> {
-    if (!this.session) return;
+    if (!this.session) {
+      return;
+    }
 
     try {
       await this.session.setAVPlaybackState(state);
@@ -97,7 +103,9 @@ export class AVSessionManager {
   }
 
   async destroy(): Promise<void> {
-    if (!this.session) return;
+    if (!this.session) {
+      return;
+    }
 
     try {
       if (this.isSessionActive) {
